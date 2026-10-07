@@ -251,26 +251,29 @@ function sameCurve(a, b) {
   return true
 }
 
-// Bar tooltip: one line per device, then the temperatures and fan on their own lines.
+// Bar tooltip: four short lines — Lighting, Mouse, Temp, Fans.
 function barTooltip(devices, fan, daemonError) {
+  var kb = firstOfKind(devices, "keyboard")
+  var mouse = firstOfKind(devices, "mouse")
   var lines = []
-  for (var i = 0; i < devices.length; i++) {
-    var d = devices[i]
-    var parts = []
-    if (d.battery !== null && d.battery !== undefined) parts.push(d.battery + "% battery" + (d.charging ? " (charging)" : ""))
-    if (d.dpi) parts.push(d.dpi + " DPI")
-    if (d.pollRate) parts.push(pollLabel(d.pollRate))
-    if (d.effect) parts.push((effectLabels[d.effect] || d.effect) + (d.brightness !== null && d.brightness !== undefined && d.effect !== "off" ? " " + d.brightness + "%" : ""))
-    lines.push(displayName(d) + (parts.length ? "  —  " + parts.join(" · ") : ""))
+  if (kb) lines.push("Lighting  " + (kb.effect === "off" ? "Off" : (effectLabels[kb.effect] || kb.effect) + (kb.brightness !== null && kb.brightness !== undefined ? " " + kb.brightness + "%" : "")))
+  if (mouse) {
+    var mp = []
+    if (mouse.battery !== null && mouse.battery !== undefined) mp.push(mouse.battery + "%" + (mouse.charging ? " charging" : ""))
+    if (mouse.dpi) mp.push(mouse.dpi + " DPI")
+    lines.push("Mouse     " + (mp.length ? mp.join(" · ") : "connected"))
+  } else {
+    lines.push("Mouse     not found")
   }
-  if (lines.length === 0) lines.push(errorTitle(daemonError))
-  if (fan && fan.temps) {
-    if (fan.temps.cpu !== null && fan.temps.cpu !== undefined) lines.push("CPU  " + fmtTemp(fan.temps.cpu))
-    if (fan.temps.gpu !== null && fan.temps.gpu !== undefined) lines.push("GPU  " + fmtTemp(fan.temps.gpu))
+  if (!kb && !mouse) lines = [errorTitle(daemonError)]
+  if (fan && fan.temps && fan.temps.cpu !== null && fan.temps.cpu !== undefined) {
+    var tp = ["CPU " + fmtTemp(fan.temps.cpu)]
+    if (fan.temps.gpu !== null && fan.temps.gpu !== undefined) tp.push("GPU " + fmtTemp(fan.temps.gpu))
+    lines.push("Temp      " + tp.join(" · "))
   }
   if (fan && fan.backend === "ok") {
-    var mode = fan.mode === "auto" ? "Auto" : fan.mode === "manual" ? "Manual " + fan.manualDuty + "%" : "Curve " + (fan.targetDuty !== null ? fan.targetDuty + "%" : "")
-    lines.push("Fan  " + (fan.rpm !== null && fan.rpm !== undefined ? fan.rpm + " RPM" : "--") + "  ·  " + mode)
+    var mode = fan.mode === "auto" ? "Auto" : fan.mode === "manual" ? "Manual" : "Curve"
+    lines.push("Fans      " + (fan.rpm !== null && fan.rpm !== undefined ? fan.rpm + " RPM" : "--") + " · " + mode)
   }
   return lines.join("\n")
 }
