@@ -390,6 +390,10 @@ def pointer_apply(settings, mouse_names):
         accel = "adaptive"
     applied = []
     for name in targets:
+        # Device names come from hyprctl, but they still go into a Lua string: allow only the
+        # characters Hyprland itself produces for them.
+        if not re.fullmatch(r"[A-Za-z0-9._:-]+", name):
+            continue
         lua = 'hl.device({ name = "%s", sensitivity = %.3f, accel_profile = "%s" })' % (name, sens, accel)
         res = safe(lambda: subprocess.run(["hyprctl", "eval", lua], capture_output=True, text=True, timeout=5))
         if res is not None and res.returncode == 0:

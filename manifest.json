@@ -3,7 +3,7 @@
   "id": "dan.open-razer",
   "name": "Open Razer",
   "version": "2.0.0",
-  "author": "dan",
+  "author": "Daniel Marr",
   "license": "MIT",
   "description": "Razer Blade laptop and Basilisk mouse control for the Omarchy shell: Chroma lighting, DPI, polling rate, pointer speed, battery, fan curves and power profiles",
   "kinds": [

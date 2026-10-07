@@ -1,12 +1,12 @@
 #!/bin/bash
 #
 # Installs (or updates) this plugin into ~/.config/omarchy/plugins/<id> and
-# enables it in the bar. If the old `dan.razer-chroma` widget is in the bar
-# layout, it is swapped for this one in place so it keeps its position.
+# enables it in the bar. With --replace <old-id>, a widget already in the bar
+# layout under that id is swapped for this one in place so it keeps its position.
 #
 # For a fresh machine you can instead use:  omarchy plugin add <git url> --enable
 #
-# Usage: scripts/install.sh [--no-enable]
+# Usage: scripts/install.sh [--no-enable] [--replace <old-plugin-id>]
 
 set -euo pipefail
 
@@ -14,9 +14,16 @@ SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 ID=$(jq -r .id "$SRC/manifest.json")
 DEST="$HOME/.config/omarchy/plugins/$ID"
 SHELL_JSON="$HOME/.config/omarchy/shell.json"
-OLD_ID="dan.razer-chroma"
+OLD_ID=""
 ENABLE=1
-[[ ${1:-} == "--no-enable" ]] && ENABLE=0
+while (( $# > 0 )); do
+  case "$1" in
+    --no-enable) ENABLE=0; shift ;;
+    --replace) OLD_ID="${2:-}"; [[ -n $OLD_ID ]] || { echo "--replace needs a plugin id" >&2; exit 1; }; shift 2 ;;
+    -h|--help) sed -n '2,12p' "$0"; exit 0 ;;
+    *) echo "unknown option: $1" >&2; exit 1 ;;
+  esac
+done
 
 say() { printf '\033[1;32m==>\033[0m %s\n' "$*"; }
 
@@ -35,14 +42,14 @@ fi
 omarchy-shell shell rescanPlugins >/dev/null 2>&1 || true
 
 if [[ $ENABLE -eq 1 ]]; then
-  if [[ -f $SHELL_JSON ]] && jq -e --arg old "$OLD_ID" '[.. | objects | select(.id? == $old)] | length > 0' "$SHELL_JSON" >/dev/null; then
+  if [[ -n $OLD_ID && -f $SHELL_JSON ]] && jq -e --arg old "$OLD_ID" '[.. | objects | select(.id? == $old)] | length > 0' "$SHELL_JSON" >/dev/null; then
     backup="$SHELL_JSON.bak.$(date +%s)"
     cp "$SHELL_JSON" "$backup"
     jq --arg old "$OLD_ID" --arg new "$ID" \
       'walk(if type == "object" and .id? == $old then .id = $new else . end)' "$backup" >"$SHELL_JSON"
     say "Replaced $OLD_ID with $ID in shell.json (backup: $backup)"
-    # A widget hosted inside a kristofferr.groups drawer is instantiated from the
-    # group's in-memory item list, which only re-reads shell.json on a shell
+    # A widget hosted inside a Groups drawer (kristofferr.groups) is instantiated
+    # from the group's in-memory item list, which only re-reads shell.json on a shell
     # restart; a plain rescan leaves the old id loaded and the new one dormant.
     omarchy-shell shell rescanPlugins >/dev/null 2>&1 || true
     if command -v omarchy-restart-shell >/dev/null; then

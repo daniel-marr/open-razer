@@ -1,8 +1,7 @@
 # Open Razer (`dan.open-razer`)
 
-One Omarchy bar widget for a Razer Blade laptop and a Razer mouse. It grew out
-of the `dan.razer-chroma` ("Razer 17 Pro") widget and adds full mouse control
-and laptop fan/power control.
+One Omarchy bar widget for a Razer Blade laptop and a Razer mouse: lighting,
+mouse settings, fan curves and power profiles in a single panel.
 
 The panel has three tabs:
 
@@ -23,8 +22,8 @@ scripts/install.sh
 ```
 
 `scripts/install.sh` copies the plugin into `~/.config/omarchy/plugins/dan.open-razer`
-and, if the old `dan.razer-chroma` widget is in your bar, swaps it in place
-(a backup of `shell.json` is kept next to it).
+and enables it. Pass `--replace <old-plugin-id>` to swap an existing widget for
+this one in place, keeping its bar position (a backup of `shell.json` is kept).
 
 ### Keyboard and mouse (OpenRazer)
 
@@ -69,9 +68,9 @@ The Fans tab offers to run this script when the backend is missing.
 **Modes**
 
 - **Auto**: the EC controls the fans (default).
-- **Manual**: pin one duty. 0% is the EC's minimum RPM, 100% its maximum
-  (2300–4300 RPM on the Blade 17 Pro Mid 2021; the range comes from
-  `laptops.json` per model).
+- **Manual**: pin one duty. 0% is the EC's minimum RPM, 100% its maximum.
+  The range is per model and comes from razer-control's `laptops.json`
+  (for example 2300–4300 RPM on a Blade 17 Pro).
 - **Curve**: five temperature → duty points, linearly interpolated, driven by
   the CPU package temperature, the NVIDIA GPU temperature or whichever is
   hotter. `open-razer-fan.service` evaluates it every 3 seconds, writes the
@@ -129,6 +128,16 @@ Both scripts work standalone:
 ./fan_ctl.py set-power 4 2 2
 ```
 
+## Supported hardware
+
+- Lighting and mouse: anything the OpenRazer daemon supports. Controls appear
+  only for capabilities the device reports.
+- Fans and power: Razer Blade models listed in razer-control-revived's
+  `laptops.json` (about fifty, 2016 onwards). Other laptops keep lighting and
+  mouse control but show "Fan control not set up".
+- Device names in the panel come from OpenRazer, with bracketed years and
+  marketing suffixes trimmed.
+
 ## Files
 
 - `Panel.qml` — bar button and panel
@@ -137,3 +146,4 @@ Both scripts work standalone:
 - `fan_ctl.py` — fan modes, curve service, temperatures, power profiles
 - `scripts/install.sh` — install/update the plugin and put it in the bar
 - `scripts/setup-fan-backend.sh` — build and install the fan daemon as user services
+- `assets/razer-logo.svg` — the bar icon; its path data is embedded in `Model.js`

@@ -367,8 +367,7 @@ Panel {
 
   Timer {
     // Background poll kept slow on purpose: every status read sends ~10 commands to the
-    // wireless mouse dongle, and that traffic through the dock's VIA hub was wedging the
-    // hub and dropping the DisplayLink monitors (see displaylink-watchdog). 2026-10-07
+    // wireless mouse dongle, and constant traffic through some USB hubs can wedge them.
     interval: panel.open ? 3000 : 300000
     running: true
     repeat: true

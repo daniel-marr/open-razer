@@ -598,7 +598,7 @@ Wants=razercontrol.service
 
 [Service]
 Type=simple
-ExecStart={python} {script} serve
+ExecStart="{python}" "{script}" serve
 Restart=on-failure
 RestartSec=5
 
