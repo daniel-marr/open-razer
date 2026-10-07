@@ -554,16 +554,19 @@ Panel {
             height: size
             anchors.verticalCenter: parent.verticalCenter
             Shape {
-              width: 24
-              height: 24
-              scale: parent.size / 24
+              // Scale the logo's viewBox into the icon canvas, keeping aspect.
+              readonly property real logoScale: parent.size / Math.max(Model.razerLogo.width, Model.razerLogo.height)
+              x: -Model.razerLogo.x * logoScale + (parent.size - Model.razerLogo.width * logoScale) / 2
+              y: -Model.razerLogo.y * logoScale + (parent.size - Model.razerLogo.height * logoScale) / 2
+              width: Model.razerLogo.width
+              height: Model.razerLogo.height
+              scale: logoScale
               transformOrigin: Item.TopLeft
               preferredRendererType: Shape.CurveRenderer
-              ShapePath {
-                fillColor: button.logoColor
-                strokeWidth: -1
-                PathSvg { path: Model.razerLogoPath }
-              }
+              // ShapePath isn't an Item, so a Repeater can't emit them: one per path.
+              ShapePath { fillColor: button.logoColor; strokeWidth: -1; PathSvg { path: Model.razerLogo.paths[0] || "" } }
+              ShapePath { fillColor: button.logoColor; strokeWidth: -1; PathSvg { path: Model.razerLogo.paths[1] || "" } }
+              ShapePath { fillColor: button.logoColor; strokeWidth: -1; PathSvg { path: Model.razerLogo.paths[2] || "" } }
             }
           }
 
@@ -592,7 +595,7 @@ Panel {
     open: root.opened
     focusTarget: keyCatcher
     contentWidth: panel.fittedContentWidth(Style.space(420))
-    contentHeight: panel.fittedContentHeight(panelColumn.implicitHeight, Style.space(720))
+    contentHeight: panel.fittedContentHeight(panelColumn.implicitHeight, Style.space(1400))
 
     onOpenChanged: if (open) {
       root.refresh()
