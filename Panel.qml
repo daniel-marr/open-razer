@@ -24,7 +24,7 @@ Panel {
   readonly property string fontFamily: bar ? bar.fontFamily : Style.font.family
 
   // Settings
-  readonly property bool showBatteryInBar: setting("showBatteryInBar", true) !== false
+  readonly property bool showBatteryInBar: setting("showBatteryInBar", false) === true
   readonly property bool showFanInBar: setting("showFanInBar", false) === true
   readonly property bool onlyWhenConnected: setting("onlyWhenConnected", false) === true
 
@@ -377,9 +377,10 @@ Panel {
   }
 
   Timer {
-    // Fan status is cheap (unix socket + hwmon), so it can run more often.
+    // Fan status is cheap (unix socket + hwmon), so it can run more often, and it
+    // keeps running in the background so the bar tooltip always has figures.
     interval: panel.open ? 4000 : 60000
-    running: panel.open || root.showFanInBar
+    running: true
     repeat: true
     triggeredOnStart: true
     onTriggered: root.refreshFan()
@@ -528,14 +529,9 @@ Panel {
     readonly property color logoColor: root.bar ? root.bar.barForeground : root.foreground
     text: readout === "" ? "" : " "   // keeps hasVisualContent true for the hit-test
     slotSize: Style.bar.iconSlot * (1.0 + (showBattery ? 1.1 : 0) + (showFan ? 2.6 : 0))
-    tooltipText: {
-      var lines = root.devices.map(function(d) {
-        return Model.displayName(d) + (Model.deviceSummary(d) ? " — " + Model.deviceSummary(d) : "")
-      })
-      if (lines.length === 0) lines.push(Model.errorTitle(root.daemonError))
-      if (root.fanReady) lines.push("Fans — " + Model.fanSummary(root.fan) + " · " + Model.fanDetail(root.fan))
-      return lines.join("\n")
-    }
+    tooltipText: Model.barTooltip(root.devices, root.fan, root.daemonError)
+    // Hovering is when the figures matter: fetch fresh ones.
+    onTooltipHoveredChanged: if (tooltipHovered) root.refreshFan()
     onPressed: function(b) {
       if (b === Qt.RightButton) root.refresh()
       else root.toggle()

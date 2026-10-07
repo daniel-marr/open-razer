@@ -93,7 +93,7 @@ source changes.
 
 | Key | Default | Meaning |
 |-----|---------|---------|
-| `showBatteryInBar` | true | Mouse battery next to the bar icon |
+| `showBatteryInBar` | false | Mouse battery next to the bar icon |
 | `showFanInBar` | false | Fan RPM and CPU temperature next to the bar icon |
 | `onlyWhenConnected` | false | Hide the widget when OpenRazer lists no devices |
 

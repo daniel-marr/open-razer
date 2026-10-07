@@ -30,7 +30,7 @@
     "allowMultiple": false,
     "defaultSection": "right",
     "defaults": {
-      "showBatteryInBar": true,
+      "showBatteryInBar": false,
       "showFanInBar": false,
       "onlyWhenConnected": false,
       "pointerSensitivity": 0,
@@ -42,7 +42,7 @@
         "type": "boolean",
         "label": "Show mouse battery in the bar",
         "description": "Display the wireless mouse battery level next to the bar icon",
-        "defaultValue": true
+        "defaultValue": false
       },
       {
         "key": "showFanInBar",

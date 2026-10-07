@@ -251,6 +251,30 @@ function sameCurve(a, b) {
   return true
 }
 
+// Bar tooltip: one line per device, then the temperatures and fan on their own lines.
+function barTooltip(devices, fan, daemonError) {
+  var lines = []
+  for (var i = 0; i < devices.length; i++) {
+    var d = devices[i]
+    var parts = []
+    if (d.battery !== null && d.battery !== undefined) parts.push(d.battery + "% battery" + (d.charging ? " (charging)" : ""))
+    if (d.dpi) parts.push(d.dpi + " DPI")
+    if (d.pollRate) parts.push(pollLabel(d.pollRate))
+    if (d.effect) parts.push((effectLabels[d.effect] || d.effect) + (d.brightness !== null && d.brightness !== undefined && d.effect !== "off" ? " " + d.brightness + "%" : ""))
+    lines.push(displayName(d) + (parts.length ? "  —  " + parts.join(" · ") : ""))
+  }
+  if (lines.length === 0) lines.push(errorTitle(daemonError))
+  if (fan && fan.temps) {
+    if (fan.temps.cpu !== null && fan.temps.cpu !== undefined) lines.push("CPU  " + fmtTemp(fan.temps.cpu))
+    if (fan.temps.gpu !== null && fan.temps.gpu !== undefined) lines.push("GPU  " + fmtTemp(fan.temps.gpu))
+  }
+  if (fan && fan.backend === "ok") {
+    var mode = fan.mode === "auto" ? "Auto" : fan.mode === "manual" ? "Manual " + fan.manualDuty + "%" : "Curve " + (fan.targetDuty !== null ? fan.targetDuty + "%" : "")
+    lines.push("Fan  " + (fan.rpm !== null && fan.rpm !== undefined ? fan.rpm + " RPM" : "--") + "  ·  " + mode)
+  }
+  return lines.join("\n")
+}
+
 function fanBackendTitle(backend) {
   if (backend === "no-cli") return "Fan control not set up"
   if (backend === "no-daemon") return "Fan daemon not running"
