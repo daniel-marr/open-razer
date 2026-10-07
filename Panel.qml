@@ -555,7 +555,7 @@ Panel {
             anchors.verticalCenter: parent.verticalCenter
             Shape {
               // Scale the logo's viewBox into the icon canvas, keeping aspect.
-              readonly property real logoScale: parent.size / Math.max(Model.razerLogo.width, Model.razerLogo.height)
+              readonly property real logoScale: parent.size * 0.82 / Math.max(Model.razerLogo.width, Model.razerLogo.height)
               x: -Model.razerLogo.x * logoScale + (parent.size - Model.razerLogo.width * logoScale) / 2
               y: -Model.razerLogo.y * logoScale + (parent.size - Model.razerLogo.height * logoScale) / 2
               width: Model.razerLogo.width
@@ -565,8 +565,6 @@ Panel {
               preferredRendererType: Shape.CurveRenderer
               // ShapePath isn't an Item, so a Repeater can't emit them: one per path.
               ShapePath { fillColor: button.logoColor; strokeWidth: -1; PathSvg { path: Model.razerLogo.paths[0] || "" } }
-              ShapePath { fillColor: button.logoColor; strokeWidth: -1; PathSvg { path: Model.razerLogo.paths[1] || "" } }
-              ShapePath { fillColor: button.logoColor; strokeWidth: -1; PathSvg { path: Model.razerLogo.paths[2] || "" } }
             }
           }
 
@@ -1101,12 +1099,12 @@ Panel {
           }
 
           // =====================================================================
-          // FANS: manual duty
+          // FANS: manual duty (only while in Manual mode)
           // =====================================================================
           Column {
             width: parent.width
             spacing: Style.space(8)
-            visible: root.tab === "fans" && root.fanReady
+            visible: root.tab === "fans" && root.fanReady && root.curMode === "manual"
 
             SectionRow {
               width: parent.width
@@ -1122,16 +1120,8 @@ Panel {
               step: 5
               integer: true
               value: root.curManual
-              opacity: root.curMode === "manual" ? 1.0 : 0.6
               onMoved: function(v) { root.curManual = Math.round(v) }
               onReleased: function(v) { root.applyManual(v) }
-            }
-
-            Hint {
-              width: parent.width
-              text: root.curMode === "manual"
-                ? "0% is the EC's minimum (" + root.fan.fanRange[0] + " RPM), 100% its maximum (" + root.fan.fanRange[1] + " RPM)"
-                : "Only used in Manual mode"
             }
           }
 
