@@ -11,8 +11,8 @@ import "Model.js" as Model
 Panel {
   id: root
 
-  moduleName: "dan.open-razer"
-  ipcTarget: "dan.open-razer"
+  moduleName: "open-razer"
+  ipcTarget: "open-razer"
   manageIpc: false
 
   readonly property string pluginDir: Qt.resolvedUrl(".").toString().replace("file://", "")

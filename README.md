@@ -1,4 +1,4 @@
-# Open Razer (`dan.open-razer`)
+# Open Razer (`open-razer`)
 
 One Omarchy bar widget for a Razer Blade laptop and a Razer mouse: lighting,
 mouse settings, fan curves and power profiles in a single panel.
@@ -21,7 +21,7 @@ omarchy plugin add https://github.com/daniel-marr/open-razer.git --enable
 scripts/install.sh
 ```
 
-`scripts/install.sh` copies the plugin into `~/.config/omarchy/plugins/dan.open-razer`
+`scripts/install.sh` copies the plugin into `~/.config/omarchy/plugins/open-razer`
 and enables it. Pass `--replace <old-plugin-id>` to swap an existing widget for
 this one in place, keeping its bar position (a backup of `shell.json` is kept).
 
@@ -103,18 +103,18 @@ plugin loads. Fan settings live in `~/.config/open-razer/fans.json`.
 ## IPC
 
 ```sh
-omarchy-shell dan.open-razer toggle
-omarchy-shell dan.open-razer tab fans              # keyboard | mouse | fans
-omarchy-shell dan.open-razer effect keyboard spectrum
-omarchy-shell dan.open-razer color mouse "#FF0000"
-omarchy-shell dan.open-razer brightness keyboard 60
-omarchy-shell dan.open-razer dpi 1600
-omarchy-shell dan.open-razer stage 2
-omarchy-shell dan.open-razer poll 1000
-omarchy-shell dan.open-razer pointer 0.25
-omarchy-shell dan.open-razer fanMode curve         # auto | manual | curve
-omarchy-shell dan.open-razer fanDuty 70
-omarchy-shell dan.open-razer power 1               # 0 Balanced … 4 Custom
+omarchy-shell open-razer toggle
+omarchy-shell open-razer tab fans              # keyboard | mouse | fans
+omarchy-shell open-razer effect keyboard spectrum
+omarchy-shell open-razer color mouse "#FF0000"
+omarchy-shell open-razer brightness keyboard 60
+omarchy-shell open-razer dpi 1600
+omarchy-shell open-razer stage 2
+omarchy-shell open-razer poll 1000
+omarchy-shell open-razer pointer 0.25
+omarchy-shell open-razer fanMode curve         # auto | manual | curve
+omarchy-shell open-razer fanDuty 70
+omarchy-shell open-razer power 1               # 0 Balanced … 4 Custom
 ```
 
 Both scripts work standalone:
