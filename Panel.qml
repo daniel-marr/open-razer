@@ -560,7 +560,14 @@ Panel {
               transformOrigin: Item.TopLeft
               preferredRendererType: Shape.CurveRenderer
               // ShapePath isn't an Item, so a Repeater can't emit them: one per path.
-              ShapePath { fillColor: button.logoColor; strokeWidth: -1; PathSvg { path: Model.razerLogo.paths[0] || "" } }
+              // Fill plus a same-colour stroke: the SVG's masked outside stroke of 3
+              // is a centred stroke of 6 once the inner half lands on the fill.
+              ShapePath {
+                fillColor: button.logoColor
+                strokeColor: button.logoColor
+                strokeWidth: 6
+                PathSvg { path: Model.razerLogo.paths[0] || "" }
+              }
             }
           }
 
