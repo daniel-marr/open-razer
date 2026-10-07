@@ -17,7 +17,7 @@ Controls only show when the selected device supports them.
 ## Install
 
 ```sh
-omarchy plugin add https://github.com/<you>/open-razer.git --enable
+omarchy plugin add https://github.com/daniel-marr/open-razer.git --enable
 # or, from a checkout:
 scripts/install.sh
 ```
