@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "id": "dan.open-razer",
+  "name": "Open Razer",
+  "version": "2.0.0",
+  "author": "dan",
+  "license": "MIT",
+  "description": "Razer Blade laptop and Basilisk mouse control for the Omarchy shell: Chroma lighting, DPI, polling rate, pointer speed, battery, fan curves and power profiles",
+  "kinds": [
+    "bar-widget"
+  ],
+  "entryPoints": {
+    "barWidget": "Panel.qml"
+  },
+  "barWidget": {
+    "displayName": "Open Razer",
+    "description": "Keyboard and mouse lighting, mouse sensitivity and pointer settings, laptop fan curves and power profiles",
+    "category": "Hardware",
+    "aliases": [
+      "razer",
+      "chroma",
+      "openrazer",
+      "keyboard",
+      "mouse",
+      "basilisk",
+      "fans",
+      "fan",
+      "blade"
+    ],
+    "allowMultiple": false,
+    "defaultSection": "right",
+    "defaults": {
+      "showBatteryInBar": true,
+      "showFanInBar": false,
+      "onlyWhenConnected": false,
+      "pointerSensitivity": 0,
+      "pointerAccel": "adaptive"
+    },
+    "schema": [
+      {
+        "key": "showBatteryInBar",
+        "type": "boolean",
+        "label": "Show mouse battery in the bar",
+        "description": "Display the wireless mouse battery level next to the bar icon",
+        "defaultValue": true
+      },
+      {
+        "key": "showFanInBar",
+        "type": "boolean",
+        "label": "Show fan speed and CPU temperature in the bar",
+        "description": "Display the laptop fan RPM and CPU temperature next to the bar icon",
+        "defaultValue": false
+      },
+      {
+        "key": "onlyWhenConnected",
+        "type": "boolean",
+        "label": "Show in bar only when a device is found",
+        "description": "Hide the bar widget when OpenRazer reports no devices",
+        "defaultValue": false
+      }
+    ]
+  }
+}
