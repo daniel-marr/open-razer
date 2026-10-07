@@ -49,6 +49,11 @@ if [[ $ENABLE -eq 1 ]]; then
       say "Restarting the shell so the bar picks up the new widget"
       omarchy-restart-shell >/dev/null 2>&1 || true
     fi
+  elif [[ -f $SHELL_JSON ]] && jq -e --arg id "$ID" '[.. | objects | select(.groupId? != null) | .items[]? | select(.id == $id)] | length > 0' "$SHELL_JSON" >/dev/null; then
+    # Hosted in a groups drawer: the group reloads hosted widgets unevenly, so
+    # one bar can keep running the old copy. A restart loads it cleanly.
+    say "$ID is hosted in a group; restarting the shell to reload it"
+    command -v omarchy-restart-shell >/dev/null && omarchy-restart-shell >/dev/null 2>&1 || true
   elif omarchy-plugin-list --json 2>/dev/null | jq -e --arg id "$ID" 'any(.[]; .id == $id and (.enabled == true))' >/dev/null; then
     say "$ID is already enabled"
   else

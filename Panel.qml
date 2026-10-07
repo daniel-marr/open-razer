@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import QtQuick.Shapes
 import Quickshell
 import Quickshell.Io
 import qs.Commons
@@ -522,9 +523,11 @@ Panel {
     visible: root.visible
     readonly property bool showBattery: root.showBatteryInBar && root.mouse && root.mouse.battery !== null && !vertical
     readonly property bool showFan: root.showFanInBar && root.fanReady && root.fan.rpm !== null && !vertical
-    text: (showBattery ? ("󰍽 " + root.mouse.battery + "%") : "󰌌")
-          + (showFan ? ("  󰈐 " + root.fan.rpm + " " + Model.fmtTemp(root.fan.temps.cpu)) : "")
-    slotSize: Style.bar.iconSlot * (1.0 + (showBattery ? 1.2 : 0) + (showFan ? 2.6 : 0))
+    readonly property string readout: (showBattery ? (root.mouse.battery + "%") : "")
+          + (showFan ? ((showBattery ? "  " : "") + "󰈐 " + root.fan.rpm + " " + Model.fmtTemp(root.fan.temps.cpu)) : "")
+    readonly property color logoColor: root.bar ? root.bar.barForeground : root.foreground
+    text: readout === "" ? "" : " "   // keeps hasVisualContent true for the hit-test
+    slotSize: Style.bar.iconSlot * (1.0 + (showBattery ? 1.1 : 0) + (showFan ? 2.6 : 0))
     tooltipText: {
       var lines = root.devices.map(function(d) {
         return Model.displayName(d) + (Model.deviceSummary(d) ? " — " + Model.deviceSummary(d) : "")
@@ -536,6 +539,44 @@ Panel {
     onPressed: function(b) {
       if (b === Qt.RightButton) root.refresh()
       else root.toggle()
+    }
+
+    // Razer logo in place of a glyph, with the optional battery / fan readout beside it.
+    iconComponent: Component {
+      Item {
+        Row {
+          anchors.centerIn: parent
+          spacing: Style.space(5)
+
+          Item {
+            readonly property real size: Style.bar.iconCanvas
+            width: size
+            height: size
+            anchors.verticalCenter: parent.verticalCenter
+            Shape {
+              width: 24
+              height: 24
+              scale: parent.size / 24
+              transformOrigin: Item.TopLeft
+              preferredRendererType: Shape.CurveRenderer
+              ShapePath {
+                fillColor: button.logoColor
+                strokeWidth: -1
+                PathSvg { path: Model.razerLogoPath }
+              }
+            }
+          }
+
+          Text {
+            visible: button.readout !== ""
+            text: button.readout
+            anchors.verticalCenter: parent.verticalCenter
+            font.family: root.fontFamily
+            font.pixelSize: Style.bar.iconFont
+            color: button.logoColor
+          }
+        }
+      }
     }
   }
 
@@ -1001,6 +1042,35 @@ Panel {
           }
 
           // =====================================================================
+          // FANS: sensor (which temperature drives the curve)
+          // =====================================================================
+          Column {
+            width: parent.width
+            spacing: Style.space(8)
+            visible: root.tab === "fans" && root.fanReady
+
+            SectionRow {
+              width: parent.width
+              title: "SENSOR"
+              valueText: "CPU " + Model.fmtTemp(root.fan.temps.cpu) + (root.fan.temps.gpu !== null ? "  ·  GPU " + Model.fmtTemp(root.fan.temps.gpu) : "")
+            }
+
+            ButtonGroup {
+              options: Model.sourceOptions(root.fan.temps)
+              value: root.curSource
+              fontFamily: root.fontFamily
+              foreground: root.foreground
+              onChanged: function(val) { root.applySource(val) }
+            }
+          }
+
+          PanelSeparator {
+            width: parent.width
+            visible: root.tab === "fans" && root.fanReady
+            foreground: root.foreground
+          }
+
+          // =====================================================================
           // FANS: mode
           // =====================================================================
           Column {
@@ -1152,28 +1222,6 @@ Panel {
               onClicked: root.applyCurve()
             }
 
-            RowLayout {
-              width: parent.width
-              PanelSectionHeader {
-                text: "SENSOR"
-                foreground: root.foreground
-              }
-              Item { Layout.fillWidth: true; height: 1 }
-              Text {
-                text: "CPU " + Model.fmtTemp(root.fan.temps.cpu) + (root.fan.temps.gpu !== null ? "  ·  GPU " + Model.fmtTemp(root.fan.temps.gpu) : "")
-                font.family: root.fontFamily
-                font.pixelSize: Style.font.caption
-                color: Qt.darker(root.foreground, 1.4)
-              }
-            }
-
-            ButtonGroup {
-              options: Model.sourceOptions(root.fan.temps)
-              value: root.curSource
-              fontFamily: root.fontFamily
-              foreground: root.foreground
-              onChanged: function(val) { root.applySource(val) }
-            }
           }
 
           PanelSeparator {
